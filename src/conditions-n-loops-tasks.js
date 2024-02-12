@@ -301,8 +301,20 @@ function isContainNumber(num, digit) {
  *  [2, 3, 9, 5] => 2       => 2 + 3 === 5 then balance element is 9 and its index = 2
  *  [1, 2, 3, 4, 5] => -1   => no balance element
  */
-function getBalanceIndex(/* arr */) {
-  throw new Error('Not implemented');
+function getBalanceIndex(arr) {
+  let sum = 0;
+  for (let i = 0; i < arr.length; i += 1) {
+    sum += arr[i];
+  }
+  let leftSum = 0;
+  for (let i = 0; i < arr.length; i += 1) {
+    sum -= arr[i];
+    if (leftSum === sum) {
+      return i;
+    }
+    leftSum += arr[i];
+  }
+  return -1;
 }
 
 /**
@@ -326,8 +338,47 @@ function getBalanceIndex(/* arr */) {
  *          [10, 9,  8,  7]
  *        ]
  */
-function getSpiralMatrix(/* size */) {
-  throw new Error('Not implemented');
+function getSpiralMatrix(size) {
+  const result = [];
+  for (let i = 0; i < size; i += 1) {
+    result[i] = [];
+  }
+  let row = 0;
+  let column = 0;
+  let direction = 'right';
+  for (let i = 1; i <= size * size; i += 1) {
+    result[row][column] = i;
+    if (direction === 'right') {
+      if (column === size - 1 || result[row][column + 1] !== undefined) {
+        direction = 'down';
+        row += 1;
+      } else {
+        column += 1;
+      }
+    } else if (direction === 'down') {
+      if (row === size - 1 || result[row + 1][column] !== undefined) {
+        direction = 'left';
+        column -= 1;
+      } else {
+        row += 1;
+      }
+    } else if (direction === 'left') {
+      if (column === 0 || result[row][column - 1] !== undefined) {
+        direction = 'up';
+        row -= 1;
+      } else {
+        column -= 1;
+      }
+    } else if (direction === 'up') {
+      if (row === 0 || result[row - 1][column] !== undefined) {
+        direction = 'right';
+        column += 1;
+      } else {
+        row -= 1;
+      }
+    }
+  }
+  return result;
 }
 
 /**
@@ -345,8 +396,10 @@ function getSpiralMatrix(/* size */) {
  *    [7, 8, 9]         [9, 6, 3]
  *  ]                 ]
  */
-function rotateMatrix(/* matrix */) {
-  throw new Error('Not implemented');
+function rotateMatrix(matrix) {
+  return matrix[0]
+    .map((_, colIndex) => matrix.map((row) => row[colIndex]))
+    .map((row) => row.reverse());
 }
 
 /**
@@ -363,10 +416,9 @@ function rotateMatrix(/* matrix */) {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc(/* arr */) {
-  throw new Error('Not implemented');
+function sortByAsc(arr) {
+  return arr.sort((a, b) => a - b);
 }
-
 /**
  * Shuffles characters in a string so that the characters with an odd index are moved to the end of the string at each iteration.
  * Take into account that the string can be very long and the number of iterations is large. Consider how you can optimize your solution.
@@ -384,8 +436,24 @@ function sortByAsc(/* arr */) {
  *  '012345', 3 => '024135' => '043215' => '031425'
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
-function shuffleChar(/* str, iterations */) {
-  throw new Error('Not implemented');
+function shuffleChar(str, iterations) {
+  const chars = str.split('');
+  const shuffledChars = chars.reduce(
+    (acc, _, index) => {
+      if (index % 2 === 0) {
+        acc.even.push(chars[index]);
+      } else {
+        acc.odd.push(chars[index]);
+      }
+      return acc;
+    },
+    { even: [], odd: [] }
+  );
+  const shuffledString = shuffledChars.even.concat(shuffledChars.odd).join('');
+  if (iterations === 1) {
+    return shuffledString;
+  }
+  return shuffleChar(shuffledString, iterations - 1);
 }
 
 /**
@@ -405,8 +473,39 @@ function shuffleChar(/* str, iterations */) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger(/* number */) {
-  throw new Error('Not implemented');
+function getNearestBigger(number) {
+  const digits = [];
+  let temp = number;
+  while (temp > 0) {
+    digits.unshift(temp % 10);
+    temp = Math.floor(temp / 10);
+  }
+  let middleIndex = -1;
+  for (let i = digits.length - 2; i >= 0; i -= 1) {
+    if (digits[i] < digits[i + 1]) {
+      middleIndex = i;
+      break;
+    }
+  }
+  if (middleIndex === -1) {
+    return number;
+  }
+  let smallestGreaterIndex = middleIndex + 1;
+  for (let j = middleIndex + 2; j < digits.length; j += 1) {
+    if (
+      digits[j] > digits[middleIndex] &&
+      digits[j] <= digits[smallestGreaterIndex]
+    ) {
+      smallestGreaterIndex = j;
+    }
+  }
+  const temperary = digits[middleIndex];
+  digits[middleIndex] = digits[smallestGreaterIndex];
+  digits[smallestGreaterIndex] = temperary;
+  const right = digits.splice(middleIndex + 1);
+  right.sort((a, b) => a - b);
+  const nextLargest = parseInt([...digits, ...right].join(''), 10);
+  return nextLargest;
 }
 
 module.exports = {
